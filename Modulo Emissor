@@ -1,0 +1,49 @@
+//Código del módulo Emisor
+#include <ESP8266WiFi.h>
+const char* ssid = "galaxy";
+const char* password = "arduino1234";
+///////
+
+// Definición de clave de cifrado
+const int clave = 5;
+String codificar(String texto) {
+String textoCodificado = "I";
+int longitud = texto.length();
+for (int i = 0; i < longitud; i++) {
+char caracter = texto.charAt(i);
+// Aplicar el desplazamiento según la clave de cifrado
+char caracterCodificado = caracter + clave;
+// Agregar el carácter codificado al texto codificado
+textoCodificado += caracterCodificado;
+}
+return textoCodificado;
+}
+
+///////
+WiFiServer server(80);
+void setup()
+{
+Serial.begin(115200);
+delay(10);
+WiFi.mode(WIFI_STA);
+WiFi.begin(ssid, password);
+while (WiFi.status() != WL_CONNECTED) {
+delay(500);
+Serial.println("Conectando a WiFi..");
+}
+Serial.println("Conectado a la WiFi");
+// Imprimir la dirección IP de la placa en el Monitor Serial
+Serial.print("Dirección IP de la placa: ");
+Serial.println(WiFi.localIP());
+server.begin();
+}
+void loop()
+{
+WiFiClient client = server.available();
+if (client) {
+String message = "ola santi";
+String textoCod = codificar(message);
+client.print(textoCod);
+delay(10);
+}
+}
