@@ -1,0 +1,47 @@
+//Código del módulo Receptor
+
+#include <ESP8266WiFi.h>
+const char* ssid = "galaxy";
+const char* password = "arduino1234";
+const char* host = "192.168.72.141";
+// Definición de clave de cifrado
+const int clave = 5;
+
+String decodificar(String textoCodificado) {
+String textoDecodificado = "";
+int longitud = textoCodificado.length();
+for (int i = 0; i < longitud; i++) {
+char caracterCodificado = textoCodificado.charAt(i);
+
+// Aplicar el desplazamiento inverso según la clave de cifrado
+char caracterDecodificado = caracterCodificado - clave;
+// Agregar el carácter decodificado al texto decodificado
+textoDecodificado += caracterDecodificado;
+}
+return textoDecodificado;
+}
+void setup()
+{
+Serial.begin(115200);
+delay(10);
+WiFi.mode(WIFI_STA);
+WiFi.begin(ssid, password);
+while (WiFi.status() != WL_CONNECTED) {
+delay(500);
+Serial.println("Conectando a WiFi..");
+}
+Serial.println("Conectado a la WiFi");
+}
+void loop()
+{
+delay(5000);
+Serial.print("Conectando a ");
+Serial.println(host);
+WiFiClient client;
+if (!client.connect(host, 80)) {
+Serial.println("Conexión fallida");
+return;
+}
+String message = client.readStringUntil('\r');
+String textdeCod=decodificar(message);
+Serial.println("Mensaje recibido: " + textdeCod );
